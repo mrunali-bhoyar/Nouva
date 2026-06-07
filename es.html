@@ -1,0 +1,389 @@
+<!--
+  EcoTrend - Single-file working website
+  Save this file as `index.html` and open in a browser (or host on GitHub Pages / Netlify / Vercel).
+  Features:
+  - Home / About / Products / Sell / Exchange / Contact sections
+  - Product listing stored in localStorage (supports adding new products via form)
+  - Simple filtering, search, and a product details modal
+  - Responsive layout, accessible, and commented for learning
+
+  Team suggestions:
+  - Business Lead: fill content in About/Business sections and prepare business plan
+  - Tech Lead: extend this code to use Firebase for real backend
+  - Marketing Lead: design social assets, test UX and prepare demo slides
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EcoTrend — Sustainable Fashion Marketplace</title>
+  <meta name="description" content="Buy, sell, and exchange eco-friendly fashion. Student startup demo for Entrepreneurship Skills." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🌿</text></svg>"> 
+  <style>
+    :root{--green:#2f8f5a;--muted:#6b6b6b;--bg:#f8f8f6;--card:#ffffff;--accent:#e6f4ea}
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; margin:0; background:var(--bg); color:#222}
+    header{background:linear-gradient(90deg,var(--green),#4ca26f); color:white; padding:18px 24px; position:sticky; top:0; z-index:40}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    nav{display:flex;align-items:center;gap:18px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .brand .leaf{font-size:22px}
+    .nav-right{margin-left:auto;display:flex;gap:10px}
+    a.btn{background:rgba(255,255,255,0.15);border:0;padding:8px 12px;border-radius:8px;color:#fff;text-decoration:none;font-weight:600}
+    a.btn:hover{background:rgba(255,255,255,0.2)}
+
+    /* Hero */
+    .hero{padding:56px 0;color:#0b2b1a}
+    .hero-grid{display:grid;grid-template-columns:1fr 420px;gap:32px;align-items:center}
+    .hero h1{font-size:36px;margin:0 0 12px}
+    .hero p{color:var(--muted);margin:0 0 18px}
+    .cta-row{display:flex;gap:10px}
+    button.primary{background:var(--green);color:white;padding:12px 16px;border-radius:10px;border:0;font-weight:700}
+    button.ghost{background:transparent;border:2px solid var(--green);color:var(--green);padding:10px 14px;border-radius:10px}
+
+    /* Cards & products */
+    .section{padding:34px 0}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .card{background:var(--card);padding:14px;border-radius:14px;box-shadow:0 6px 18px rgba(15,15,15,0.06)}
+    .product-img{width:100%;height:200px;border-radius:10px;object-fit:cover;background:linear-gradient(135deg,#f0f0f0,#ffffff);display:flex;align-items:center;justify-content:center;color:#999}
+    .product-title{font-weight:700;margin:10px 0 6px}
+    .product-meta{color:var(--muted);font-size:13px}
+    .product-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .pill{background:var(--accent);padding:6px 10px;border-radius:999px;font-weight:600;color:var(--green)}
+
+    /* Forms */
+    form{display:grid;gap:10px}
+    input[type=text], input[type=email], textarea, select{padding:10px;border-radius:8px;border:1px solid #ddd}
+    label{font-weight:600;font-size:13px}
+
+    /* Footer */
+    footer{padding:22px 0;background:#fff;margin-top:18px;border-top:1px solid #eee}
+
+    /* Responsive */
+    @media (max-width:880px){
+      .hero-grid{grid-template-columns:1fr;}
+      .nav-right{display:none}
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="brand"><span class="leaf">🌿</span> <span>EcoTrend</span></div>
+        <div class="nav-right">
+          <a class="btn" href="#products">Products</a>
+          <a class="btn" href="#sell">Sell / Exchange</a>
+          <a class="btn" href="#about">About</a>
+          <a class="btn" href="#contact">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <h1>Style that sustains the planet</h1>
+          <p>EcoTrend is a student startup demo — a simple marketplace to buy, sell, and exchange pre-loved or upcycled clothes. Build your greener wardrobe and help reduce textile waste.</p>
+          <div class="cta-row">
+            <button class="primary" id="open-sell">Sell / Exchange</button>
+            <button class="ghost" id="scroll-products">Browse Products</button>
+          </div>
+          <div style="margin-top:16px;color:var(--muted);font-size:14px">Team of 3 — Business, Tech, Marketing. Demo uses local browser storage. For a production backend use Firebase or a simple Node API.</div>
+        </div>
+        <div>
+          <div class="card" style="text-align:center;">
+            <div style="font-weight:700">How it works</div>
+            <ol style="text-align:left;color:var(--muted);padding-left:16px;margin:12px 0">
+              <li>Browse & search sustainable clothing</li>
+              <li>List your item to sell or offer an exchange</li>
+              <li>Contact seller & arrange pickup/shipping</li>
+            </ol>
+            <div style="margin-top:12px;font-size:13px;color:var(--muted)">Tip: Use the Sell form to add a product — images are saved to your browser.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="products" class="section">
+      <div class="container">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+          <h2 style="margin:0">Products</h2>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <input id="search" placeholder="Search products, e.g. denim" style="padding:8px;border-radius:8px;border:1px solid #ddd;" />
+            <select id="filter-category" style="padding:8px;border-radius:8px;border:1px solid #ddd">
+              <option value="all">All categories</option>
+              <option>Women</option>
+              <option>Men</option>
+              <option>Kids</option>
+              <option>Accessories</option>
+            </select>
+            <button class="ghost" id="clear-storage">Clear Data</button>
+          </div>
+        </div>
+
+        <div id="products-grid" class="cards" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="sell" class="section">
+      <div class="container">
+        <h2>Sell or Exchange Your Item</h2>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:12px">
+          <div class="card">
+            <form id="sell-form">
+              <label for="title">Product title</label>
+              <input id="title" type="text" required placeholder="E.g. Upcycled denim jacket" />
+
+              <label for="category">Category</label>
+              <select id="category">
+                <option>Women</option>
+                <option>Men</option>
+                <option>Kids</option>
+                <option>Accessories</option>
+              </select>
+
+              <label for="condition">Condition</label>
+              <select id="condition">
+                <option>Like new</option>
+                <option>Good</option>
+                <option>Fair</option>
+              </select>
+
+              <label for="price">Suggested price (₹)</label>
+              <input id="price" type="text" placeholder="e.g. 499" />
+
+              <label for="description">Description</label>
+              <textarea id="description" rows="4" placeholder="Materials, size, wash instructions, upcycle notes"></textarea>
+
+              <label for="image">Image (optional)</label>
+              <input id="image" type="file" accept="image/*" />
+
+              <label for="contact">Contact (email or phone)</label>
+              <input id="contact" type="text" placeholder="seller@example.com or +91-98765..." />
+
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                <button type="submit" class="primary">List Item</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div style="font-weight:700;margin-bottom:8px">Preview / Tips</div>
+            <div style="color:var(--muted);font-size:14px">
+              - Use clear photos and short, honest descriptions.<br>
+              - Mention sustainable points (organic cotton, upcycled, hand-stitched).<br>
+              - You can edit the code to integrate Firebase for real storage.
+            </div>
+            <div style="margin-top:12px;">
+              <div class="pill">Local demo — data saved in browser</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="container">
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;align-items:start">
+          <div>
+            <h2>About EcoTrend</h2>
+            <p style="color:var(--muted)">EcoTrend is a student-built demo marketplace to showcase an MVP for sustainable fashion. It focuses on circular fashion: resale, upcycling, and education. Use this as your entrepreneurship project to show product, business model, and demo website.</p>
+            <h3 style="margin-top:12px">Business Model</h3>
+            <ul style="color:var(--muted)">
+              <li>Commission on successful sales (demo: not implemented)</li>
+              <li>Premium listings for verified eco-brands</li>
+              <li>Workshops & brand partnerships</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div style="font-weight:700">Quick metrics (demo)</div>
+            <div style="margin-top:8px;color:var(--muted)">
+              - Target audience: 18–30 urban students and young professionals<br>
+              - Customer acquisition: campus ambassadors and Instagram<br>
+              - Cost structure: minimal (hosting + marketing)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container">
+        <h2>Contact</h2>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:12px">
+          <div class="card">
+            <form id="contact-form">
+              <label>Email</label>
+              <input id="contact-email" type="email" required />
+              <label>Message</label>
+              <textarea id="contact-message" rows="4" required></textarea>
+              <div style="display:flex;justify-content:flex-end;margin-top:8px">
+                <button type="submit" class="primary">Send</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div style="font-weight:700">Team</div>
+            <div style="margin-top:8px;color:var(--muted)">
+              <div><strong>Member 1</strong> — Business Lead</div>
+              <div><strong>Member 2</strong> — Tech Lead</div>
+              <div><strong>Member 3</strong> — Marketing & Design</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container" style="display:flex;align-items:center;gap:12px">
+      <div>© <strong>EcoTrend</strong> — Student demo</div>
+      <div style="margin-left:auto;color:var(--muted);font-size:13px">Built for Entrepreneurship Skills — demo uses browser storage</div>
+    </div>
+  </footer>
+
+  <!-- Product details modal (hidden) -->
+  <div id="modal" role="dialog" aria-hidden="true" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:80">
+    <div style="width:min(720px,94%);background:#fff;border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,0.2);max-height:88vh;overflow:auto">
+      <button id="close-modal" style="float:right;border:0;background:transparent;font-size:18px">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Simple client-side product store using localStorage ---
+    const STORAGE_KEY = 'ecotrend_products_v1';
+
+    function uid() { return 'p_'+Math.random().toString(36).slice(2,9); }
+
+    // Seed sample products if none exist
+    function seedProducts(){
+      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if(existing.length) return;
+      const samples = [
+        {id:uid(), title:'Upcycled Denim Jacket', category:'Women', price:'799', condition:'Good', desc:'Hand-upcycled denim with embroidered patches.', contact:'seller1@example.com', image:placeholderSvg('Denim Jacket')},
+        {id:uid(), title:'Organic Cotton T-Shirt', category:'Men', price:'399', condition:'Like new', desc:'100% organic cotton, size M.', contact:'seller2@example.com', image:placeholderSvg('T-Shirt')},
+        {id:uid(), title:'Boho Scarf', category:'Accessories', price:'199', condition:'Good', desc:'Handmade scarf from reclaimed fabric.', contact:'seller3@example.com', image:placeholderSvg('Scarf')}
+      ];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(samples));
+    }
+
+    function placeholderSvg(text){
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='white'/><text x='50%' y='50%' font-size='28' dominant-baseline='middle' text-anchor='middle' fill='%23999'>${escapeHtml(text)}</text></svg>`;
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    function getProducts(){ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    function saveProducts(list){ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+
+    // Render products to DOM
+    function renderProducts(filter='all', q=''){
+      const grid = document.getElementById('products-grid'); grid.innerHTML='';
+      const products = getProducts().filter(p=> (filter==='all' || p.category===filter) && (q.trim()==='' || (p.title+p.desc+p.category).toLowerCase().includes(q.toLowerCase())));
+      if(!products.length){ grid.innerHTML = `<div style="grid-column:1/-1;padding:18px;background:var(--card);border-radius:12px;color:var(--muted)">No products found. Try listing one!</div>`; return; }
+      products.forEach(p=>{
+        const el = document.createElement('div'); el.className='card';
+        el.innerHTML = `
+          <div style="cursor:pointer" data-id="${p.id}" class="product-click">
+            <div class="product-img"><img src="${p.image}" alt="${escapeHtml(p.title)}" style="width:100%;height:100%;border-radius:10px;object-fit:cover"/></div>
+            <div class="product-title">${escapeHtml(p.title)}</div>
+            <div class="product-meta">${escapeHtml(p.category)} • ${escapeHtml(p.condition)} • ₹${escapeHtml(p.price||'—')}</div>
+          </div>
+          <div class="product-actions">
+            <div class="pill">${escapeHtml(p.contact || 'Contact not provided')}</div>
+            <div style="display:flex;gap:8px">
+              <button data-id="${p.id}" class="view-btn">View</button>
+              <button data-id="${p.id}" class="del-btn">Delete</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(el);
+      });
+    }
+
+    // Event handlers
+    document.addEventListener('click', e=>{
+      if(e.target.matches('.view-btn') || e.target.closest('.product-click')){
+        const id = e.target.dataset.id || e.target.closest('.product-click')?.dataset.id; openProduct(id);
+      }
+      if(e.target.matches('.del-btn')){
+        const id = e.target.dataset.id; if(confirm('Delete this listing?')) deleteProduct(id);
+      }
+    });
+
+    function openProduct(id){
+      const p = getProducts().find(x=>x.id===id); if(!p) return;
+      const modal = document.getElementById('modal');
+      const content = document.getElementById('modal-content');
+      content.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start">
+          <div><img src="${p.image}" alt="${escapeHtml(p.title)}" style="width:100%;border-radius:8px;object-fit:cover"/></div>
+          <div>
+            <h3 style="margin:0">${escapeHtml(p.title)}</h3>
+            <div style="color:var(--muted);margin-top:6px">${escapeHtml(p.category)} • ${escapeHtml(p.condition)}</div>
+            <div style="font-weight:700;margin-top:8px">₹${escapeHtml(p.price||'—')}</div>
+            <p style="color:var(--muted);margin-top:8px">${escapeHtml(p.desc||'No description')}</p>
+            <div style="margin-top:12px"><strong>Contact:</strong> ${escapeHtml(p.contact||'—')}</div>
+            <div style="margin-top:12px"><a href="mailto:${encodeURIComponent(p.contact||'')}?subject=${encodeURIComponent('Interested in '+p.title)}" class="btn">Email Seller</a></div>
+          </div>
+        </div>
+      `;
+      modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+    }
+    document.getElementById('close-modal').addEventListener('click', ()=>{ document.getElementById('modal').style.display='none'; document.getElementById('modal').setAttribute('aria-hidden','true'); });
+
+    function deleteProduct(id){
+      const arr = getProducts().filter(x=>x.id!==id); saveProducts(arr); renderProducts();
+    }
+
+    // Sell form: reads file and stores base64 or placeholder
+    document.getElementById('sell-form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const title = document.getElementById('title').value.trim();
+      const category = document.getElementById('category').value;
+      const condition = document.getElementById('condition').value;
+      const price = document.getElementById('price').value.trim();
+      const desc = document.getElementById('description').value.trim();
+      const contact = document.getElementById('contact').value.trim();
+      const file = document.getElementById('image').files[0];
+      let image = placeholderSvg(title || 'Product');
+      if(file){ image = await readFileAsDataURL(file); }
+      const p = {id:uid(), title, category, condition, price, desc, contact, image};
+      const arr = getProducts(); arr.unshift(p); saveProducts(arr);
+      e.target.reset(); renderProducts(); alert('Item listed locally — refresh the page to test persistence');
+    });
+
+    function readFileAsDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+
+    // Contact form
+    document.getElementById('contact-form').addEventListener('submit', e=>{
+      e.preventDefault(); const email = document.getElementById('contact-email').value; const msg = document.getElementById('contact-message').value; alert('Thank you! Message captured locally for demo.\n\nEmail: '+email+'\nMessage: '+msg); e.target.reset();
+    });
+
+    // Search / filter
+    document.getElementById('search').addEventListener('input', ()=>{ renderProducts(document.getElementById('filter-category').value, document.getElementById('search').value); });
+    document.getElementById('filter-category').addEventListener('change', ()=>{ renderProducts(document.getElementById('filter-category').value, document.getElementById('search').value); });
+
+    // Clear storage (for demo/testing)
+    document.getElementById('clear-storage').addEventListener('click', ()=>{ if(confirm('Clear all demo product data?')){ localStorage.removeItem(STORAGE_KEY); seedProducts(); renderProducts(); }});
+
+    // Navigation helpers
+    document.getElementById('scroll-products').addEventListener('click', ()=>{ location.hash='#products'; document.getElementById('search').focus(); });
+    document.getElementById('open-sell').addEventListener('click', ()=>{ location.hash='#sell'; document.getElementById('title').focus(); });
+
+    // init
+    seedProducts(); renderProducts();
+
+  </script>
+</body>
+</html>
